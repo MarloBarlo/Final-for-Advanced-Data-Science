@@ -1,0 +1,472 @@
+#+SUBTITLE: DSC 205 - Advanced introduction to data science
+#+STARTUP: overview hideblocks indent inlineimages
+#+AUTHOR: [YOUR NAME] PLEDGED
+#+OPTIONS: toc:nil num:nil ^:nil
+#+PROPERTY: header-Args:R :Session *R* :results output :exports both :noweb yes
+#+attr_html: :width 300px
+
+
+* Installing the package
+
+   - Install and load the caret package using ~install.packages~
+     #+begin_src R
+       ##install.packages("caret")
+       library(caret)
+       library(MASS)
+     #+end_src
+
+     #+RESULTS:
+     #+begin_example
+
+     Loading required package: ggplot2
+     Loading required package: lattice
+
+     Attaching package: ‘caret’
+
+     The following object is masked from ‘package:httr’:
+
+         progress
+
+     Warning messages:
+     1: package ‘caret’ was built under R version 4.1.2 
+     2: package ‘ggplot2’ was built under R version 4.1.2
+
+     Warning message:
+     package ‘MASS’ was built under R version 4.1.2
+     #+end_example
+
+   - look at the functions that come with the package using ~ls~
+     (p.s. its a lot)
+     #+begin_src R
+       ls("package:caret")
+     #+end_src
+
+     #+RESULTS:
+     #+begin_example
+       [1] "anovaScores"           "avNNet"                "bag"                  
+       [4] "bagControl"            "bagEarth"              "bagEarthStats"        
+       [7] "bagFDA"                "best"                  "BoxCoxTrans"          
+      [10] "calibration"           "caretFuncs"            "caretGA"              
+      [13] "caretSA"               "caretSBF"              "caretTheme"           
+      [16] "cforestStats"          "checkConditionalX"     "checkInstall"         
+      [19] "checkResamples"        "class2ind"             "classDist"            
+      [22] "cluster"               "compare_models"        "confusionMatrix"      
+      [25] "confusionMatrix.train" "contr.dummy"           "contr.ltfr"           
+      [28] "createDataPartition"   "createFolds"           "createModel"          
+      [31] "createMultiFolds"      "createResample"        "createTimeSlices"     
+      [34] "ctreeBag"              "defaultSummary"        "dotPlot"              
+      [37] "downSample"            "dummyVars"             "expandParameters"     
+      [40] "expoTrans"             "extractPrediction"     "extractProb"          
+      [43] "F_meas"                "featurePlot"           "filterVarImp"         
+      [46] "findCorrelation"       "findLinearCombos"      "flatTable"            
+      [49] "gafs"                  "gafs_initial"          "gafs_lrSelection"     
+      [52] "gafs_raMutation"       "gafs_rwSelection"      "gafs_spCrossover"     
+      [55] "gafs_tourSelection"    "gafs_uCrossover"       "gafs.default"         
+      [58] "gafsControl"           "gamFormula"            "gamFuncs"             
+      [61] "gamScores"             "getModelInfo"          "getSamplingInfo"      
+      [64] "getTrainPerf"          "ggplot.gafs"           "ggplot.safs"          
+      [67] "groupKFold"            "hasTerms"              "icr"                  
+      [70] "index2vec"             "ipredStats"            "knn3"                 
+      [73] "knn3Train"             "knnreg"                "knnregTrain"          
+      [76] "ldaBag"                "ldaFuncs"              "ldaSBF"               
+      [79] "learning_curve_dat"    "lift"                  "lmFuncs"              
+      [82] "lmSBF"                 "LPH07_1"               "LPH07_2"              
+      [85] "lrFuncs"               "MAE"                   "maxDissim"            
+      [88] "MeanSD"                "minDiss"               "mnLogLoss"            
+      [91] "modelCor"              "modelLookup"           "multiClassSummary"    
+      [94] "nbBag"                 "nbFuncs"               "nbSBF"                
+      [97] "nearZeroVar"           "negPredValue"          "nnetBag"              
+     [100] "nullModel"             "nzv"                   "oneSE"                
+     [103] "outcome_conversion"    "panel.calibration"     "panel.lift"           
+     [106] "panel.lift2"           "panel.needle"          "pcaNNet"              
+     [109] "pickSizeBest"          "pickSizeTolerance"     "pickVars"             
+     [112] "plot.gafs"             "plot.rfe"              "plot.safs"            
+     [115] "plot.train"            "plotClassProbs"        "plotObsVsPred"        
+     [118] "plsBag"                "plsda"                 "posPredValue"         
+     [121] "postResample"          "precision"             "predict.bagEarth"     
+     [124] "predict.gafs"          "predict.train"         "predictionFunction"   
+     [127] "predictors"            "preProcess"            "print.train"          
+     [130] "probFunction"          "progress"              "prSummary"            
+     [133] "R2"                    "recall"                "resampleHist"         
+     [136] "resamples"             "resampleSummary"       "resampleWrapper"      
+     [139] "rfe"                   "rfeControl"            "rfeIter"              
+     [142] "rfFuncs"               "rfGA"                  "rfSA"                 
+     [145] "rfSBF"                 "rfStats"               "RMSE"                 
+     [148] "safs"                  "safs_initial"          "safs_perturb"         
+     [151] "safs_prob"             "safsControl"           "sbf"                  
+     [154] "sbfControl"            "sbfIter"               "sensitivity"          
+     [157] "SLC14_1"               "SLC14_2"               "sortImp"              
+     [160] "spatialSign"           "specificity"           "splsda"               
+     [163] "sumDiss"               "summary.bagEarth"      "svmBag"               
+     [166] "thresholder"           "tolerance"             "train"                
+     [169] "trainControl"          "treebagFuncs"          "treebagGA"            
+     [172] "treebagSA"             "treebagSBF"            "twoClassSim"          
+     [175] "twoClassSummary"       "upSample"              "var_seq"              
+     [178] "varImp"                "well_numbered"
+     #+end_example
+     
+* Linear Regression Models
+   
+   - we are going to use the ~diamonds~ dataset in this example. first lets
+     make sure we have the dataset
+     #+begin_src R
+       str(diamonds)
+       head(diamonds,3)
+     #+end_src
+
+     #+RESULTS:
+     #+begin_example
+     tibble [53,940 × 10] (S3: tbl_df/tbl/data.frame)
+      $ carat  : num [1:53940] 0.23 0.21 0.23 0.29 0.31 0.24 0.24 0.26 0.22 0.23 ...
+      $ cut    : Ord.factor w/ 5 levels "Fair"<"Good"<..: 5 4 2 4 2 3 3 3 1 3 ...
+      $ color  : Ord.factor w/ 7 levels "D"<"E"<"F"<"G"<..: 2 2 2 6 7 7 6 5 2 5 ...
+      $ clarity: Ord.factor w/ 8 levels "I1"<"SI2"<"SI1"<..: 2 3 5 4 2 6 7 3 4 5 ...
+      $ depth  : num [1:53940] 61.5 59.8 56.9 62.4 63.3 62.8 62.3 61.9 65.1 59.4 ...
+      $ table  : num [1:53940] 55 61 65 58 58 57 57 55 61 61 ...
+      $ price  : int [1:53940] 326 326 327 334 335 336 336 337 337 338 ...
+      $ x      : num [1:53940] 3.95 3.89 4.05 4.2 4.34 3.94 3.95 4.07 3.87 4 ...
+      $ y      : num [1:53940] 3.98 3.84 4.07 4.23 4.35 3.96 3.98 4.11 3.78 4.05 ...
+      $ z      : num [1:53940] 2.43 2.31 2.31 2.63 2.75 2.48 2.47 2.53 2.49 2.39 ...
+
+     # A tibble: 3 × 10
+       carat cut     color clarity depth table price     x     y     z
+       <dbl> <ord>   <ord> <ord>   <dbl> <dbl> <int> <dbl> <dbl> <dbl>
+     1  0.23 Ideal   E     SI2      61.5    55   326  3.95  3.98  2.43
+     2  0.21 Premium E     SI1      59.8    61   326  3.89  3.84  2.31
+     3  0.23 Good    E     VS1      56.9    65   327  4.05  4.07  2.31
+     #+end_example
+
+   - First lets make a simple linear regression model of the price of diamonds using ~lm~ and
+     assing it to ~dm_model~. 
+     #+begin_src R
+       dm_model <- lm(price ~ ., diamonds)
+       dm_model
+     #+end_src
+
+     #+RESULTS:
+     #+begin_example
+
+     Call:
+     lm(formula = price ~ ., data = diamonds)
+
+     Coefficients:
+     (Intercept)        carat        cut.L        cut.Q        cut.C        cut^4  
+        5753.762    11256.978      584.457     -301.908      148.035      -20.794  
+         color.L      color.Q      color.C      color^4      color^5      color^6  
+       -1952.160     -672.054     -165.283       38.195      -95.793      -48.466  
+       clarity.L    clarity.Q    clarity.C    clarity^4    clarity^5    clarity^6  
+        4097.431    -1925.004      982.205     -364.918      233.563        6.883  
+       clarity^7        depth        table            x            y            z  
+          90.640      -63.806      -26.474    -1008.261        9.609      -50.119
+     #+end_example
+
+   - Lets look at the ~summary~ of the model
+     #+begin_src R
+      summary(dm_model)
+     #+end_src
+
+     #+RESULTS:
+     #+begin_example
+
+     Call:
+     lm(formula = price ~ ., data = diamonds)
+
+     Residuals:
+          Min       1Q   Median       3Q      Max 
+     -21376.0   -592.4   -183.5    376.4  10694.2 
+
+     Coefficients:
+                  Estimate Std. Error  t value Pr(>|t|)    
+     (Intercept)  5753.762    396.630   14.507  < 2e-16 ***
+     carat       11256.978     48.628  231.494  < 2e-16 ***
+     cut.L         584.457     22.478   26.001  < 2e-16 ***
+     cut.Q        -301.908     17.994  -16.778  < 2e-16 ***
+     cut.C         148.035     15.483    9.561  < 2e-16 ***
+     cut^4         -20.794     12.377   -1.680  0.09294 .  
+     color.L     -1952.160     17.342 -112.570  < 2e-16 ***
+     color.Q      -672.054     15.777  -42.597  < 2e-16 ***
+     color.C      -165.283     14.725  -11.225  < 2e-16 ***
+     color^4        38.195     13.527    2.824  0.00475 ** 
+     color^5       -95.793     12.776   -7.498 6.59e-14 ***
+     color^6       -48.466     11.614   -4.173 3.01e-05 ***
+     clarity.L    4097.431     30.259  135.414  < 2e-16 ***
+     clarity.Q   -1925.004     28.227  -68.197  < 2e-16 ***
+     clarity.C     982.205     24.152   40.668  < 2e-16 ***
+     clarity^4    -364.918     19.285  -18.922  < 2e-16 ***
+     clarity^5     233.563     15.752   14.828  < 2e-16 ***
+     clarity^6       6.883     13.715    0.502  0.61575    
+     clarity^7      90.640     12.103    7.489 7.06e-14 ***
+     depth         -63.806      4.535  -14.071  < 2e-16 ***
+     table         -26.474      2.912   -9.092  < 2e-16 ***
+     x           -1008.261     32.898  -30.648  < 2e-16 ***
+     y               9.609     19.333    0.497  0.61918    
+     z             -50.119     33.486   -1.497  0.13448    
+     ---
+     codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+     Residual standard error: 1130 on 53916 degrees of freedom
+     Multiple R-squared:  0.9198,	Adjusted R-squared:  0.9198 
+     F-statistic: 2.688e+04 on 23 and 53916 DF,  p-value: < 2.2e-16
+     #+end_example
+ 
+   - Now lets make a prediction using our model on the orginal data
+     using ~predict~ and use that to compute the error of the model.
+
+     #+begin_src R
+       p_dm <- predict(model, diamonds)
+       dm_error <- p_dm - diamonds[["price"]]
+       sqrt(mean(dm_error ^ 2))
+     #+end_src
+
+     #+RESULTS:
+     : 
+     : [1] 1129.843
+
+* linear Regression using ~caret~
+
+   - We are going to fit a linear regession to ~price~ using all other
+     varibles in the diamonds dataset as predictors using caret's
+     ~train~ function.
+     #+begin_src R
+       dm_model_caret <- train(
+           price ~ .,
+           diamonds,
+           method ="lm",
+           trControl = trainControl(
+               method = "cv",
+               number = 10,
+               verboseIter = FALSE
+           )
+       )
+       dm_model_caret
+     #+end_src
+
+     #+RESULTS:
+     #+begin_example
+
+     Linear Regression 
+
+     53940 samples
+         9 predictor
+
+     No pre-processing
+     Resampling: Cross-Validated (10 fold) 
+     Summary of sample sizes: 48546, 48546, 48546, 48547, 48546, 48546, ... 
+     Resampling results:
+
+       RMSE      Rsquared   MAE     
+       1130.826  0.9197131  740.5777
+
+     Tuning parameter 'intercept' was held constant at a value of TRUE
+     #+end_example
+
+   - You can also set it to repeat the cross-validation procedure by
+     adding ~repeats~ to the function setting equal to a number.
+
+     #+begin_src R
+       dm_model_caret_r <- train(
+           price ~ .,
+           diamonds,
+           method = "lm",
+           trControl = trainControl(
+               method = "repeatedcv",
+               number = 10,
+               repeats = 10,
+               verboseIter = FALSE
+           )
+       )
+       dm_model_caret_r
+     #+end_src
+
+     #+RESULTS:
+     #+begin_example
+
+     Linear Regression 
+
+     53940 samples
+         9 predictor
+
+     No pre-processing
+     Resampling: Cross-Validated (10 fold, repeated 10 times) 
+     Summary of sample sizes: 48545, 48547, 48547, 48547, 48546, 48546, ... 
+     Resampling results:
+
+       RMSE      Rsquared   MAE     
+       1130.917  0.9196698  740.5334
+
+     Tuning parameter 'intercept' was held constant at a value of TRUE
+     #+end_example
+
+* Classification Models and ~confusionMatrix~
+
+   - We are going to use the ~iris~ data set for this example lets make
+     sure we have the dataset
+     #+begin_src R
+       str(iris)
+       head(iris,3)
+     #+end_src
+
+     #+RESULTS:
+     #+begin_example
+     'data.frame':	150 obs. of  5 variables:
+      $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
+      $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
+      $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
+      $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
+      $ Species     : Factor w/ 3 levels "setosa","versicolor",..: 1 1 1 1 1 1 1 1 1 1 ...
+
+       Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+     1          5.1         3.5          1.4         0.2  setosa
+     2          4.9         3.0          1.4         0.2  setosa
+     3          4.7         3.2          1.3         0.2  setosa
+     #+end_example
+
+   - Lets make a basic classification model first lets get the data
+     ready
+     #+begin_src R
+       ## getting the number of rows and randomly ordering them (cross Validation)
+       n_obs <- nrow(iris)
+       shuffled_rows <- sample(n_obs)
+       iris_mixed <- iris[shuffled_rows, ]
+       ## splitting the data in a 80/20 split to test and train without caret
+       split <- round(n_obs * 0.8)
+       iris_train <- iris_mixed[1:split, ]
+       iris_test <- iris_mixed[(split + 1):n_obs, ]
+       ## splitting data with caret using creatDataPartition
+       train_index <- createDataPartition(iris$Species, p = .8,
+                                         list = FALSE,
+                                         times = 1)
+       iris_train <- iris[train_index]
+       iris_test <- iris[-train_index]
+       ## setting the perameters into an object for cross validation
+       fitControl <- trainControl(
+           method = "repeatedcv",
+           number = 10,
+           repeats = 5)
+     #+end_src
+
+     #+RESULTS:
+
+   - Lets run ~train~ on the data like before but set ~method~ to "rpart"
+     and lets use the object from the block above for ~trControl~  
+     #+begin_src R
+       ## Fitting the glm model
+       iris_model <- train(
+           Species ~ .,
+           data = iris,
+           method = "rpart",
+           trControl = fitControl,
+           )
+       iris_model
+     #+end_src
+
+     #+RESULTS:
+     #+begin_example
+
+     CART 
+
+     150 samples
+       4 predictor
+       3 classes: 'setosa', 'versicolor', 'virginica' 
+
+     No pre-processing
+     Resampling: Cross-Validated (10 fold, repeated 5 times) 
+     Summary of sample sizes: 135, 135, 135, 135, 135, 135, ... 
+     Resampling results across tuning parameters:
+
+       cp    Accuracy   Kappa
+       0.00  0.9293333  0.894
+       0.44  0.8160000  0.724
+       0.50  0.3333333  0.000
+
+     Accuracy was used to select the optimal model using the largest value.
+     The final value used for the model was cp = 0.
+     #+end_example
+
+   - Now lets make a ~confusionMatrix~ using caret
+     #+begin_src R
+       ## getting the models perdiction
+       p_iris <- predict(iris_model, iris)
+       ## Making the confusion matrix
+       confusionMatrix(p_iris, iris$Species)
+     #+end_src  
+
+     #+RESULTS:
+     #+begin_example
+
+     Confusion Matrix and Statistics
+
+                 Reference
+     Prediction   setosa versicolor virginica
+       setosa         50          0         0
+       versicolor      0         49         5
+       virginica       0          1        45
+
+     Overall Statistics
+
+                    Accuracy : 0.96           
+                      95% CI : (0.915, 0.9852)
+         No Information Rate : 0.3333         
+         P-Value [Acc > NIR] : < 2.2e-16      
+
+                       Kappa : 0.94           
+
+      Mcnemar's Test P-Value : NA             
+
+     Statistics by Class:
+
+                          Class: setosa Class: versicolor Class: virginica
+     Sensitivity                 1.0000            0.9800           0.9000
+     Specificity                 1.0000            0.9500           0.9900
+     Pos Pred Value              1.0000            0.9074           0.9783
+     Neg Pred Value              1.0000            0.9896           0.9519
+     Prevalence                  0.3333            0.3333           0.3333
+     Detection Rate              0.3333            0.3267           0.3000
+     Detection Prevalence        0.3333            0.3600           0.3067
+     Balanced Accuracy           1.0000            0.9650           0.9450
+     #+end_example
+
+* Plotting with ~caret~ using ~featurePlot~
+
+   - In this section we will be using the iris dataset and making 3
+     plots using ~featurePlot~ lets look at the arguments of the function
+     #+begin_src R
+      args(featurePlot)
+     #+end_src
+
+     #+RESULTS:
+     : function (x, y, plot = if (is.factor(y)) "strip" else "scatter", 
+     :     labels = c("Feature", ""), ...) 
+     : NULL
+
+   - Lets make a pair-wise plot
+     #+begin_src R 
+       featurePlot(x=iris[,1:4],
+                   y=iris[,5],
+                   plot="pairs",
+                   auto.key=list(columns=3))
+     #+end_src
+
+     #+RESULTS:
+
+   - Now lets make a density plot
+     #+begin_src R
+       featurePlot(x=iris[,1:4],
+                   y=iris[,5],
+                   plot="density",
+                   scales=list(x=list(relation="free"), y=list(relation="free")),
+                   auto.key=list(columns=3))
+     #+end_src
+
+     #+RESULTS:
+
+   - Lastly lets make a box plot
+     #+begin_src R
+       featurePlot(x=iris[,1:4],
+                   y=iris[,5],
+                   plot="box",
+                   scales=list(x=list(relation="free"), y=list(relation="free")),
+                   auto.key=list(columns=3))
+     #+end_src
+
+     #+RESULTS:
