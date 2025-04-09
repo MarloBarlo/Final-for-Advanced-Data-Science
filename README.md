@@ -61,5 +61,3 @@ To get started, open your R environment and run the setup blocks to install the 
 - The modeling code is reproducible and modular to support experimentation with different methods or datasets.
 
 ---
-
-Let me know if you'd like this README tailored further for GitHub formatting (Markdown) or another format like PDF!
